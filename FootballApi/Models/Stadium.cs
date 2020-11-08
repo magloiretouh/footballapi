@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
-using System.Runtime.Serialization;
 
 namespace FootballApi.Models
 {
@@ -16,6 +14,5 @@ namespace FootballApi.Models
         public int NumberOfPlaces { get; set; }
         [Display(Name = "Team")]
         public int FootballTeamID { get; set; }
-        public virtual FootballTeam FootballTeam { get; set; }
     }
 }
