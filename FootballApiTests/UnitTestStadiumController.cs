@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Xunit;
 using FootballApi.Models;
 using FootballApi.Controllers;
@@ -16,7 +17,7 @@ namespace FootballApiTests
         public UnitTestStadiumController()
         {
             var options = new DbContextOptionsBuilder<FootballApiContext>()
-            .UseInMemoryDatabase(databaseName: "StadiumListDatabase")
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
             context = new FootballApiContext(options);
@@ -46,7 +47,7 @@ namespace FootballApiTests
         {
 
             // Arrange
-            int stadiumId = 3;
+            int stadiumId = context.Stadium.First<Stadium>().StadiumID;
 
             // Act
             var okResult = stadiumController.GetStadium(stadiumId).Result as OkObjectResult;
@@ -70,26 +71,19 @@ namespace FootballApiTests
             Assert.IsType<NotFoundResult>(notFoundResult.Result);
         }
 
-        //[Fact]
-        //public void PutStadium_ShouldAddNewItem()
-        //{
+        [Fact]
+        public void PutStadium_ShouldModifyAnItem()
+        {
+            // Arrange
+            var stadium = context.Stadium.First<Stadium>();
+            stadium.Name = "Modified Stadium Name (updated)";
 
-        //    // Arrange
-        //    int stadiumId = 1;
-        //    var stadium = new Stadium()
-        //    {
-        //        StadiumID = 1,
-        //        Name = "Stade Santiago-Bernabéu",
-        //        NumberOfPlaces = 81044,
-        //        FootballTeamID = 1
-        //    };
+            // Act
+            var noContentResult = stadiumController.PutStadium(stadium.StadiumID, stadium);
 
-        //    // Act
-        //    var noContentResult = stadiumController.PutStadium(stadiumId, stadium);
-
-        //    // Assert
-        //    Assert.IsType<NoContentResult>(noContentResult.Result);
-        //}
+            // Assert
+            Assert.IsType<NoContentResult>(noContentResult.Result);
+        }
 
         [Fact]
         public void PutStadiumDifferntIds_ShouldReturnBadRequest()
@@ -172,7 +166,7 @@ namespace FootballApiTests
         public void DeleteStadium_ShouldReturnOk()
         {
             // Arrange
-            var stadiumID = 1;
+            var stadiumID = context.Stadium.First<Stadium>().StadiumID;
 
             // Act
             var okResponse = stadiumController.DeleteStadium(stadiumID);

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Xunit;
 using FootballApi.Models;
 using FootballApi.Controllers;
@@ -16,7 +17,7 @@ namespace FootballApiTests
         public UnitTestTransactionsController()
         {
             var options = new DbContextOptionsBuilder<FootballApiContext>()
-            .UseInMemoryDatabase(databaseName: "TransactionListDatabase")
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
             context = new FootballApiContext(options);
@@ -46,7 +47,7 @@ namespace FootballApiTests
         {
 
             // Arrange
-            int transactionId = 3;
+            int transactionId = context.Transaction.First<Transaction>().TransactionID;
 
             // Act
             var okResult = transactionsController.GetTransaction(transactionId).Result as OkObjectResult;
@@ -75,17 +76,11 @@ namespace FootballApiTests
         {
 
             // Arrange
-            int transactionId = 1;
-            var transaction = new Transaction()
-            {
-                TransactionID = 1,
-                PlayerID = 12,
-                LeavingTeamID = 17,
-                ComingTeamID = 2
-            };
+            var transaction = context.Transaction.First<Transaction>();
+            transaction.PlayerID = 1;
 
             // Act
-            var noContentResult = transactionsController.PutTransaction(transactionId, transaction);
+            var noContentResult = transactionsController.PutTransaction(transaction.TransactionID, transaction);
 
             // Assert
             Assert.IsType<NoContentResult>(noContentResult.Result);
@@ -172,7 +167,7 @@ namespace FootballApiTests
         public void DeleteTransaction_ShouldReturnOk()
         {
             // Arrange
-            var transactionID = 1;
+            var transactionID = context.Transaction.First<Transaction>().TransactionID;
 
             // Act
             var okResponse = transactionsController.DeleteTransaction(transactionID);

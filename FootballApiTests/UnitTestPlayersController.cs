@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Xunit;
 using FootballApi.Models;
 using FootballApi.Controllers;
@@ -16,7 +17,7 @@ namespace FootballApiTests
         public UnitTestPlayersController()
         {
             var options = new DbContextOptionsBuilder<FootballApiContext>()
-            .UseInMemoryDatabase(databaseName: "PlayerListDatabase")
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
             context = new FootballApiContext(options);
@@ -77,7 +78,7 @@ namespace FootballApiTests
         {
 
             // Arrange
-            int playerId = 3;
+            int playerId = context.Player.First<Player>().PlayerID;
 
             // Act
             var okResult = playersController.GetPlayer(playerId).Result as OkObjectResult;
@@ -101,32 +102,20 @@ namespace FootballApiTests
             Assert.IsType<NotFoundResult>(notFoundResult.Result);
         }
 
-        //[Fact]
-        //public void PutPlayer_ShouldAddNewItem()
-        //{
+        [Fact]
+        public void PutPlayer_ShouldModifyAnItem()
+        {
 
-        //    // Arrange
-        //    int playerId = 1;
-        //    var player = new Player()
-        //    {
-        //        PlayerID = 1,
-        //        FullName = "Cristiano Ronaldo dos Santos Aveiro",
-        //        Surname = "Cristiano Ronaldo",
-        //        Height = 187,
-        //        Weight = 87,
-        //        Speed = 95,
-        //        Finishing = 98,
-        //        FreeKick = 96,
-        //        Dribbling = 87,
-        //        FootballTeamID = 1
-        //    };
+            // Arrange
+            var player = context.Player.First<Player>();
+            player.FullName = "Modified Fullname (updated)"; 
+         
+            // Act
+            var noContentResult = playersController.PutPlayer(player.PlayerID, player);
 
-        //    // Act
-        //    var noContentResult = playersController.PutPlayer(playerId, player);
-
-        //    // Assert
-        //    Assert.IsType<NoContentResult>(noContentResult.Result);
-        //}
+            // Assert
+            Assert.IsType<NoContentResult>(noContentResult.Result);
+        }
 
         [Fact]
         public void PutPlayerDifferntIds_ShouldReturnBadRequest()
@@ -232,7 +221,7 @@ namespace FootballApiTests
         public void DeletePlayer_ShouldReturnOk()
         {
             // Arrange
-            var playerID = 1;
+            var playerID = context.Player.First<Player>().PlayerID;
 
             // Act
             var okResponse = playersController.DeletePlayer(playerID);

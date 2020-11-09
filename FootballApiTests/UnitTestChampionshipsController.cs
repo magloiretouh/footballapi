@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Xunit;
 using FootballApi.Models;
@@ -8,15 +9,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FootballApiTests
 {
-    public class UnitTestChampionshipsController
+    public class UnitTestChampionshipsController : IDisposable
     {
         private readonly FootballApiContext context;
         private readonly ChampionshipsController championshipsController;
 
         public UnitTestChampionshipsController()
         {
+            // construc
             var options = new DbContextOptionsBuilder<FootballApiContext>()
-            .UseInMemoryDatabase(databaseName: "ChampionshipListDatabase")
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
             context = new FootballApiContext(options);
@@ -27,6 +29,11 @@ namespace FootballApiTests
             context.SaveChanges();
 
             championshipsController = new ChampionshipsController(context);
+        }
+
+        public void Dispose()
+        {
+            // Do some cleanup for every test
         }
 
         [Fact]
@@ -46,7 +53,7 @@ namespace FootballApiTests
         {
 
             // Arrange
-            int championshipId = 3;
+            int championshipId = context.Championship.First<Championship>().ChampionshipID;
 
             // Act
             var okResult = championshipsController.GetChampionship(championshipId).Result as OkObjectResult;
@@ -70,24 +77,20 @@ namespace FootballApiTests
             Assert.IsType<NotFoundResult>(notFoundResult.Result);
         }
 
-        //[Fact]
-        //public void PutChampionship_ShouldAddNewItem()
-        //{
+        [Fact]
+        public void PutChampionship_ShouldModifyAnItem()
+        {
 
-        //    // Arrange
-        //    int championshipId = 1;
-        //    var championship = new Championship()
-        //    {
-        //        ChampionshipID = 1,
-        //        Name = "LaLiga Santander (Updated)"
-        //    };
+            // Arrange
+            var championship = context.Championship.First<Championship>();
+            championship.Name = "Modified Championship Name (updated)";
 
-        //    // Act
-        //    var noContentResult = championshipsController.PutChampionship(championshipId, championship);
+            // Act
+            var noContentResult = championshipsController.PutChampionship(championship.ChampionshipID, championship);
 
-        //    // Assert
-        //    Assert.IsType<NoContentResult>(noContentResult.Result);
-        //}
+            // Assert
+            Assert.IsType<NoContentResult>(noContentResult.Result);
+        }
 
         [Fact]
         public void PutChampionshipDifferntIds_ShouldReturnBadRequest()
@@ -164,7 +167,7 @@ namespace FootballApiTests
         public void DeleteChampionship_ShouldReturnOk()
         {
             // Arrange
-            var championshipID = 1;
+            var championshipID = context.Championship.First<Championship>().ChampionshipID;
 
             // Act
             var okResponse = championshipsController.DeleteChampionship(championshipID);

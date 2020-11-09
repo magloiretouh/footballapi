@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Xunit;
 using FootballApi.Models;
 using FootballApi.Controllers;
@@ -16,7 +17,7 @@ namespace FootballApiTests
         public UnitTestFootballTeamsController()
         {
             var options = new DbContextOptionsBuilder<FootballApiContext>()
-            .UseInMemoryDatabase(databaseName: "TeamListDatabase")
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
             context = new FootballApiContext(options);
@@ -46,7 +47,7 @@ namespace FootballApiTests
         {
 
             // Arrange
-            int teamId = 3;
+            int teamId = context.FootballTeam.First<FootballTeam>().FootballTeamID;
 
             // Act
             var okResult = footballTeamsController.GetFootballTeam(teamId).Result as OkObjectResult;
@@ -70,24 +71,19 @@ namespace FootballApiTests
             Assert.IsType<NotFoundResult>(notFoundResult.Result);
         }
 
-        //[Fact]
-        //public void PutTeam_ShouldAddNewItem()
-        //{
+        [Fact]
+        public void PutTeam_ShouldModifyAnItem()
+        {
+            // Arrange
+            var team = context.FootballTeam.First<FootballTeam>();
+            team.Name = "Modified Team Name (updated)";
 
-        //    // Arrange
-        //    int teamId = 1;
-        //    var team = new FootballTeam()
-        //    {
-        //        teamId = 1,
-        //        Name = "LaLiga Santander (Updated)"
-        //    };
+            // Act
+            var noContentResult = footballTeamsController.PutFootballTeam(team.FootballTeamID, team);
 
-        //    // Act
-        //    var noContentResult = footballTeamsController.PutFootballTeam(teamId, team);
-
-        //    // Assert
-        //    Assert.IsType<NoContentResult>(noContentResult.Result);
-        //}
+            // Assert
+            Assert.IsType<NoContentResult>(noContentResult.Result);
+        }
 
         [Fact]
         public void PutTeamDifferntIds_ShouldReturnBadRequest()
@@ -171,7 +167,7 @@ namespace FootballApiTests
         public void DeleteTeam_ShouldReturnOk()
         {
             // Arrange
-            var teamID = 1;
+            var teamID = context.FootballTeam.First<FootballTeam>().FootballTeamID;
 
             // Act
             var okResponse = footballTeamsController.DeleteFootballTeam(teamID);
