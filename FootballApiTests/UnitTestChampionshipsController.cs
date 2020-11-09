@@ -1,5 +1,3 @@
-using System;
-using System.Diagnostics;
 using System.Linq;
 using Xunit;
 using FootballApi.Models;
@@ -166,10 +164,10 @@ namespace FootballApiTests
         public void DeleteChampionship_ShouldReturnOk()
         {
             // Arrange
-            var notExistingChampionshipID = 1;
+            var championshipID = 1;
 
             // Act
-            var okResponse = championshipsController.DeleteChampionship(notExistingChampionshipID);
+            var okResponse = championshipsController.DeleteChampionship(championshipID);
 
             // Assert
             Assert.IsType<OkObjectResult>(okResponse.Result);
