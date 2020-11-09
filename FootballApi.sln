@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.1267
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballApi", "FootballApi\FootballApi.csproj", "{3E93FA4C-ABDF-42D9-AE1F-68F0BD952477}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FootballApi", "FootballApi\FootballApi.csproj", "{3E93FA4C-ABDF-42D9-AE1F-68F0BD952477}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballApiTests", "FootballApiTests\FootballApiTests.csproj", "{ADCA0A9B-D04F-46D4-AFB5-C1DA8B0C535A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FootballApiTests", "FootballApiTests\FootballApiTests.csproj", "{ADCA0A9B-D04F-46D4-AFB5-C1DA8B0C535A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
